@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Michael Cysouw" />
+
+<meta name="date" content="2015-10-20" />
+
+<title>Specifying orthography: harmonization, tokenization and transliteration</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<link href="data:text/css,body%20%7B%0A%20%20background%2Dcolor%3A%20%23fff%3B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20max%2Dwidth%3A%20700px%3B%0A%20%20overflow%3A%20visible%3B%0A%20%20padding%2Dleft%3A%202em%3B%0A%20%20padding%2Dright%3A%202em%3B%0A%20%20font%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0A%20%20font%2Dsize%3A%2014px%3B%0A%20%20line%2Dheight%3A%201%2E35%3B%0A%7D%0A%0A%23header%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0A%0A%23TOC%20%7B%0A%20%20clear%3A%20both%3B%0A%20%20margin%3A%200%200%2010px%2010px%3B%0A%20%20padding%3A%204px%3B%0A%20%20width%3A%20400px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20border%2Dradius%3A%205px%3B%0A%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20font%2Dsize%3A%2013px%3B%0A%20%20line%2Dheight%3A%201%2E3%3B%0A%7D%0A%20%20%23TOC%20%2Etoctitle%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%20%20font%2Dsize%3A%2015px%3B%0A%20%20%20%20margin%2Dleft%3A%205px%3B%0A%20%20%7D%0A%0A%20%20%23TOC%20ul%20%7B%0A%20%20%20%20padding%2Dleft%3A%2040px%3B%0A%20%20%20%20margin%2Dleft%3A%20%2D1%2E5em%3B%0A%20%20%20%20margin%2Dtop%3A%205px%3B%0A%20%20%20%20margin%2Dbottom%3A%205px%3B%0A%20%20%7D%0A%20%20%23TOC%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dleft%3A%20%2D2em%3B%0A%20%20%7D%0A%20%20%23TOC%20li%20%7B%0A%20%20%20%20line%2Dheight%3A%2016px%3B%0A%20%20%7D%0A%0Atable%20%7B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dcolor%3A%20%23DDDDDD%3B%0A%20%20border%2Dstyle%3A%20outset%3B%0A%20%20border%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0A%20%20border%2Dwidth%3A%202px%3B%0A%20%20padding%3A%205px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%20%20line%2Dheight%3A%2018px%3B%0A%20%20padding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0A%20%20border%2Dleft%2Dstyle%3A%20none%3B%0A%20%20border%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Ap%20%7B%0A%20%20margin%3A%200%2E5em%200%3B%0A%7D%0A%0Ablockquote%20%7B%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20padding%3A%200%2E25em%200%2E75em%3B%0A%7D%0A%0Ahr%20%7B%0A%20%20border%2Dstyle%3A%20solid%3B%0A%20%20border%3A%20none%3B%0A%20%20border%2Dtop%3A%201px%20solid%20%23777%3B%0A%20%20margin%3A%2028px%200%3B%0A%7D%0A%0Adl%20%7B%0A%20%20margin%2Dleft%3A%200%3B%0A%7D%0A%20%20dl%20dd%20%7B%0A%20%20%20%20margin%2Dbottom%3A%2013px%3B%0A%20%20%20%20margin%2Dleft%3A%2013px%3B%0A%20%20%7D%0A%20%20dl%20dt%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%7D%0A%0Aul%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%7D%0A%20%20ul%20li%20%7B%0A%20%20%20%20list%2Dstyle%3A%20circle%20outside%3B%0A%20%20%7D%0A%20%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dbottom%3A%200%3B%0A%20%20%7D%0A%0Apre%2C%20code%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20color%3A%20%23333%3B%0A%7D%0Apre%20%7B%0A%20%20white%2Dspace%3A%20pre%2Dwrap%3B%20%20%20%20%2F%2A%20Wrap%20long%20lines%20%2A%2F%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20margin%3A%205px%200px%2010px%200px%3B%0A%20%20padding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Acode%20%7B%0A%20%20font%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0A%20%20font%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0A%20%20padding%3A%202px%200px%3B%0A%7D%0A%0Adiv%2Efigure%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0A%20%20background%2Dcolor%3A%20%23FFFFFF%3B%0A%20%20padding%3A%202px%3B%0A%20%20border%3A%201px%20solid%20%23DDDDDD%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20margin%3A%200%205px%3B%0A%7D%0A%0Ah1%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%20%20font%2Dsize%3A%2035px%3B%0A%20%20line%2Dheight%3A%2040px%3B%0A%7D%0A%0Ah2%20%7B%0A%20%20border%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20padding%2Dbottom%3A%202px%3B%0A%20%20font%2Dsize%3A%20145%25%3B%0A%7D%0A%0Ah3%20%7B%0A%20%20border%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20font%2Dsize%3A%20120%25%3B%0A%7D%0A%0Ah4%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0A%20%20margin%2Dleft%3A%208px%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Ah5%2C%20h6%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23ccc%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Aa%20%7B%0A%20%20color%3A%20%230033dd%3B%0A%20%20text%2Ddecoration%3A%20none%3B%0A%7D%0A%20%20a%3Ahover%20%7B%0A%20%20%20%20color%3A%20%236666ff%3B%20%7D%0A%20%20a%3Avisited%20%7B%0A%20%20%20%20color%3A%20%23800080%3B%20%7D%0A%20%20a%3Avisited%3Ahover%20%7B%0A%20%20%20%20color%3A%20%23BB00BB%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%0A%2F%2A%20Class%20described%20in%20https%3A%2F%2Fbenjeffrey%2Ecom%2Fposts%2Fpandoc%2Dsyntax%2Dhighlighting%2Dcss%0A%20%20%20Colours%20from%20https%3A%2F%2Fgist%2Egithub%2Ecom%2Frobsimmons%2F1172277%20%2A%2F%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Keyword%20%2A%2F%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%2F%2A%20DataType%20%2A%2F%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%2F%2A%20DecVal%20%28decimal%20values%29%20%2A%2F%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20BaseN%20%2A%2F%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Float%20%2A%2F%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Char%20%2A%2F%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20String%20%2A%2F%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%2F%2A%20Comment%20%2A%2F%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%2F%2A%20OtherToken%20%2A%2F%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20AlertToken%20%2A%2F%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Function%20calls%20%2A%2F%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%2F%2A%20ErrorTok%20%2A%2F%0A%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+<div id="header">
+<h1 class="title">Specifying orthography: harmonization, tokenization and transliteration</h1>
+<h4 class="author"><em>Michael Cysouw</em></h4>
+<h4 class="date"><em>2015-10-20</em></h4>
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Given any collection of linguistic strings, there are various issues that often arise in using these linguistic strings in the computational processing of such data. This vignette will give a short practical introduction to the solutions offered in the <code>qlcData</code> package. For a full theoretical discussion of all issues involved, see Moran &amp; Cysouw (forthcoming).</p>
+<p>All proposals made here (and in the paper by Moran &amp; Cysouw) are crucially rooted in the structure and technologies developed over the last few decades by the Unicode Consortion. Specifically the implementation as provided by the UCI and their porting to R in the <code>stringi</code> package are crucial for the functions described here. One might even question, whether there is any need for the functions in this package, and whether the functionality of <code>stringi</code> is not already sufficient. We see our additions as high-level functionality that (hopefully) is easily enough to be applied to also allow non-technically-inclined linguists to use it.</p>
+<p>Specifically, we offer an approach to document <em>tailorder grapheme clusters</em> (as they are called by the Unicode consortium). To deal consistenly with such clusters, the official Unicode route would be to produce <em>Unicode Local Descriptions</em>, which are overly complex for the use-cases that we have in mind. In general, our goal is to allow for quick and easy processing, which can be used for dozens (or even hundreds) of different languages/orthographies without becoming a life-long project.</p>
+<p>We see various use-cases for the <code>qlcTokenize</code> package, e.g.:</p>
+<ul>
+<li>checking consistency of the orthographic represenation in some data;</li>
+<li>tokenization of the orthography into functional units (“graphemes”), which is highly useful in language comparison (e.g. character alignment);</li>
+<li>checking for consistent application of a pre-defined orthography structure (e.g. the IPA);</li>
+<li>transliteration of orthography to another orthographic representation, specifically in cases in which the transliteration is geared towards reducing orthographic complexity (e.g. sound classes).</li>
+</ul>
+<p>In general, our solutions will not be practical for ideosyncratic orthographies like English or French, nor for chracter-based orthographies like Chinese or Japanese, but is mostly geared towards practical orthographies as used in the hundreds (thousands) of other languages in the world.</p>
+</div>
+<div id="installing-the-package" class="section level1">
+<h1>Installing the package</h1>
+<p>The current alpha-version of the package <code>qlcData</code> is available on CRAN (<em>Comprehensive R Archive Network</em>) for easy download and application. You can also directly try to install the most recent development version. If you haven’t done so already, please install the package <code>devtools</code> and then install the package <code>qlcData</code> directly from github.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install devtools from CRAN</span>
+<span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
+<span class="co"># install qlcData from github using devtools</span>
+devtools::<span class="kw">install_github</span>(<span class="st">&quot;cysouw/qlcData&quot;</span>)
+<span class="co"># load qlcTokenize package</span>
+<span class="kw">library</span>(qlcData)
+<span class="co"># access help files of the package</span>
+<span class="kw">help</span>(qlcData)</code></pre>
+</div>
+<div id="orthography-profiles" class="section level1">
+<h1>Orthography Profiles</h1>
+<p>The basic object in <code>qlcData</code> is the <em>Orthography Profile</em>. This is basically just a simple tab-separated file listing all (tailored) graphemes in some data. An orthography profile can be easily made by using <code>write.profile</code>. The result of this function is an R-dataframe, but it can also be directly written to a file by using the option <code>file = path/filename</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">test &lt;-<span class="st"> &quot;hállo hállо&quot;</span></code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write.profile</span>(test)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Grapheme</th>
+<th align="left">Frequency</th>
+<th align="left">Codepoint</th>
+<th align="left">UnicodeName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">1</td>
+<td align="left">U+0020</td>
+<td align="left">SPACE</td>
+</tr>
+<tr class="even">
+<td align="left">á</td>
+<td align="left">1</td>
+<td align="left">U+0061, U+0301</td>
+<td align="left">LATIN SMALL LETTER A, COMBINING ACUTE ACCENT</td>
+</tr>
+<tr class="odd">
+<td align="left">h</td>
+<td align="left">2</td>
+<td align="left">U+0068</td>
+<td align="left">LATIN SMALL LETTER H</td>
+</tr>
+<tr class="even">
+<td align="left">l</td>
+<td align="left">4</td>
+<td align="left">U+006C</td>
+<td align="left">LATIN SMALL LETTER L</td>
+</tr>
+<tr class="odd">
+<td align="left">o</td>
+<td align="left">1</td>
+<td align="left">U+006F</td>
+<td align="left">LATIN SMALL LETTER O</td>
+</tr>
+<tr class="even">
+<td align="left">á</td>
+<td align="left">1</td>
+<td align="left">U+00E1</td>
+<td align="left">LATIN SMALL LETTER A WITH ACUTE</td>
+</tr>
+<tr class="odd">
+<td align="left">о</td>
+<td align="left">1</td>
+<td align="left">U+043E</td>
+<td align="left">CYRILLIC SMALL LETTER O</td>
+</tr>
+</tbody>
+</table>
+<p>There are a few interesting aspects in this orthography profile.</p>
+<ul>
+<li>First note that spaces are included in the orthography profile. Space is just treated as any other character in this bare-bones function.</li>
+<li>Second, note that there are two different “o” characters. Looking at the Unicode codepoints and names it becomes clear that the one is a latin letter and the other a cyrillic letter. On most computer screens/fonts these symbols look completely identical, so it is actually easy for such a thing to happen (e.g. when writing with a russian keyboard-setting you might type a cyrillic “o”, but when copy-pasting something from some other source, you might end up with a latin “o”). The effect is that some words might look identical, but that they are not identical for the computer</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># the differenec between various &quot;o&quot; characters is mostly invisible on screen</span>
+<span class="st">&quot;o&quot;</span> ==<span class="st"> &quot;o&quot;</span>  <span class="co"># these are the same &quot;o&quot; characters, so this statement in true</span></code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="st">&quot;o&quot;</span> ==<span class="st"> &quot;о&quot;</span>  <span class="co"># this is one latin and and cyrillic &quot;o&quot; character, so this statement is false</span></code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<ul>
+<li>Third, there are two different “á” characters, one being composed of two elements (the small letter a with a separate combining acute accent), the second being a single “precomposed” element (called “small letter a with acute”). The same problem as with the “o” occurs here: they look identical, but they are not (always) identical to the computer. For this second problem there is an official Unicode solution (called ‘normalisation’, more on that below). It might even happen that when you just copy-paste the above test-string into your own R-console, that the problem automagically vanishes (because the clipboard might automatically do so-called NFC-normalisation).</li>
+<li>By default, this function lists all the Unicode codepoints and names. If you don’t want them, add the option <code>info = FALSE</code>.</li>
+<li>By default, this functions does not add a column “replacements” which will be used for transliteration later. If you want this columns, add the option <code>editing = TRUE</code></li>
+<li>Finally, note that the function also accepts vectors of strings:</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">test &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;this thing&quot;</span>, <span class="st">&quot;is&quot;</span>, <span class="st">&quot;a&quot;</span>, <span class="st">&quot;vector&quot;</span>, <span class="st">&quot;with&quot;</span>, <span class="st">&quot;many&quot;</span>, <span class="st">&quot;strings&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write.profile</span>(test)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Grapheme</th>
+<th align="left">Frequency</th>
+<th align="left">Codepoint</th>
+<th align="left">UnicodeName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">1</td>
+<td align="left">U+0020</td>
+<td align="left">SPACE</td>
+</tr>
+<tr class="even">
+<td align="left">a</td>
+<td align="left">2</td>
+<td align="left">U+0061</td>
+<td align="left">LATIN SMALL LETTER A</td>
+</tr>
+<tr class="odd">
+<td align="left">c</td>
+<td align="left">1</td>
+<td align="left">U+0063</td>
+<td align="left">LATIN SMALL LETTER C</td>
+</tr>
+<tr class="even">
+<td align="left">e</td>
+<td align="left">1</td>
+<td align="left">U+0065</td>
+<td align="left">LATIN SMALL LETTER E</td>
+</tr>
+<tr class="odd">
+<td align="left">g</td>
+<td align="left">2</td>
+<td align="left">U+0067</td>
+<td align="left">LATIN SMALL LETTER G</td>
+</tr>
+<tr class="even">
+<td align="left">h</td>
+<td align="left">3</td>
+<td align="left">U+0068</td>
+<td align="left">LATIN SMALL LETTER H</td>
+</tr>
+<tr class="odd">
+<td align="left">i</td>
+<td align="left">5</td>
+<td align="left">U+0069</td>
+<td align="left">LATIN SMALL LETTER I</td>
+</tr>
+<tr class="even">
+<td align="left">m</td>
+<td align="left">1</td>
+<td align="left">U+006D</td>
+<td align="left">LATIN SMALL LETTER M</td>
+</tr>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left">3</td>
+<td align="left">U+006E</td>
+<td align="left">LATIN SMALL LETTER N</td>
+</tr>
+<tr class="even">
+<td align="left">o</td>
+<td align="left">1</td>
+<td align="left">U+006F</td>
+<td align="left">LATIN SMALL LETTER O</td>
+</tr>
+<tr class="odd">
+<td align="left">r</td>
+<td align="left">2</td>
+<td align="left">U+0072</td>
+<td align="left">LATIN SMALL LETTER R</td>
+</tr>
+<tr class="even">
+<td align="left">s</td>
+<td align="left">4</td>
+<td align="left">U+0073</td>
+<td align="left">LATIN SMALL LETTER S</td>
+</tr>
+<tr class="odd">
+<td align="left">t</td>
+<td align="left">5</td>
+<td align="left">U+0074</td>
+<td align="left">LATIN SMALL LETTER T</td>
+</tr>
+<tr class="even">
+<td align="left">v</td>
+<td align="left">1</td>
+<td align="left">U+0076</td>
+<td align="left">LATIN SMALL LETTER V</td>
+</tr>
+<tr class="odd">
+<td align="left">w</td>
+<td align="left">1</td>
+<td align="left">U+0077</td>
+<td align="left">LATIN SMALL LETTER W</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">1</td>
+<td align="left">U+0079</td>
+<td align="left">LATIN SMALL LETTER Y</td>
+</tr>
+</tbody>
+</table>
+<p>Normally, you won’t type your data directly into R, but load the data from some file with functions like <code>scan</code> or <code>read.table</code>, and then perform <code>write.profile</code> on the data. Given the information as provided by the orthography profile, you might then want to go back to the original file and correct the inconsistencies, and then check again to see if everything is consistent now.</p>
+</div>
+<div id="tokenization" class="section level1">
+<h1>Tokenization</h1>
+<p>In most cases you will probably want to use the function <code>tokenize</code>. Besides creating orthography profiles, it will also check orthography profiles against new data (and give warnings if there is something), it will separate the input strings into graphemes, and even perform transliteration. Let’s run through a typical workflow using <code>tokenize</code>.</p>
+<p>Given some data in a specific orthography, you can call <code>tokenize</code> on the data to create an initial orthography profile (just like with <code>write.profile</code> discussed above, though there are a few small differences. For example: spaces are not included by default in the profile, and spaces in the original are replaced by hashes).</p>
+<p>The output of <code>tokenize</code> always is a list of four elements: <code>$strings</code>, <code>$profile</code>, <code>$errors</code>, and <code>$missing</code>. The second element in the list <code>$profile</code> is the table we already encountered above. The first element <code>$strings</code> is a table with the original strings, and the tokenization into graphemes as specified by the orthography profile (which in the case below was automatically produced, so there is nothing strange happening here, just a splitting into letters). The <code>$errors</code> and <code>$missing</code> are just empty at this stage, but it will contain information about strings that cannot be tokenized with a pre-established profile.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tokenize</span>(test)</code></pre>
+<pre><code>## $strings
+##    originals         tokenized
+## 1 this thing t h i s t h i n g
+## 2         is               i s
+## 3          a                 a
+## 4     vector       v e c t o r
+## 5       with           w i t h
+## 6       many           m a n y
+## 7    strings     s t r i n g s
+## 
+## $profile
+##    matched_rules Grapheme
+## 1              1        y
+## 2              1        w
+## 3              1        v
+## 4              5        t
+## 5              4        s
+## 6              2        r
+## 7              1        o
+## 8              3        n
+## 9              1        m
+## 10             5        i
+## 11             3        h
+## 12             2        g
+## 13             1        e
+## 14             1        c
+## 15             2        a
+## 16             1         
+## 
+## $errors
+## NULL
+## 
+## $missing
+## NULL</code></pre>
+<p>Now, you can work further with this profile inside R, but it is easier to write the results to a file, then correct/change these files, and use R again to process the data again. In this vignette we will not start writing anything to your disk (so the following commands will not be executed), but you might try something like the following:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dir.create</span>(<span class="st">&quot;~/Desktop/tokenize&quot;</span>)
+<span class="kw">setwd</span>(<span class="st">&quot;~/Desktop/tokenize&quot;</span>)
+<span class="kw">tokenize</span>(test, <span class="dt">file.out =</span> <span class="st">&quot;test_profile.txt&quot;</span>)</code></pre>
+<p>We are going to add two new “tailored grapheme clusters” to this profile: open the file “test_profile.txt” (in the folder “tokenize” on your Desktop) with a text editor like Textmate, Textwrangler or Notepad++ (don’t use Microsoft Word!!!). First, add a new line with only “th” on it and, second, add another line with only “ng” on it. The file will then roughly look like this:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">matched_rules</th>
+<th align="left">Grapheme</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">y</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">w</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">v</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="left">t</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">s</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">r</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">o</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">n</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">m</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="left">i</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">h</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">g</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">e</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">c</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">a</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">th</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">ng</td>
+</tr>
+</tbody>
+</table>
+<p>Now try to use this this profile with the function <code>tokenize</code>. Note that you will get a different tokenization of the strings (“th” and “ng” are now treated as a complex grapheme) and you will also obtain an updated orthography profile, which you could also immediately use to overwrite the existing profile on your disk.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tokenize</span>(test, <span class="dt">profile =</span> <span class="st">&quot;test_profile.txt&quot;</span>)
+
+<span class="co"># with overwriting of the existing profile:</span>
+<span class="co"># tokenize(test, profile = &quot;test_profile.txt&quot;, file.out = &quot;test_profile.txt&quot;)</span>
+
+<span class="co"># note that you can abbreviate this in R:</span>
+<span class="co"># tokenize_old(test, p = &quot;test_profile.txt&quot;, f = &quot;test_profile.txt&quot;)</span></code></pre>
+<pre><code>## $strings
+##    originals      tokenized
+## 1 this thing th i s th i ng
+## 2         is            i s
+## 3          a              a
+## 4     vector    v e c t o r
+## 5       with         w i th
+## 6       many        m a n y
+## 7    strings   s t r i ng s
+## 
+## $profile
+##    matched_rules matched_rules Grapheme
+## 18             2                     ng
+## 17             3                     th
+## 16             1             1         
+## 15             2             2        a
+## 14             1             1        c
+## 13             1             1        e
+## 12             0             2        g
+## 11             0             3        h
+## 10             5             5        i
+## 9              1             1        m
+## 8              1             3        n
+## 7              1             1        o
+## 6              2             2        r
+## 5              4             4        s
+## 4              2             5        t
+## 3              1             1        v
+## 2              1             1        w
+## 1              1             1        y
+## 
+## $errors
+## NULL
+## 
+## $missing
+## NULL</code></pre>
+<p>Now that we have an orthography profile, we can use this orthography profile on other data, using the profile to produce a tokenization, and at the same time checking the data for any strings that do not appear in the profile (which might be errors in the data). Note that the following will give a warning, but it will still go through and give some output. All symbols that were not found in the orthography profile are simply separated according to unicode grapheme definitions, a new orthogrphy profile explicitly for this dataset is made, and the problematic string are summarised in the warnings of the output, linked to the original strings in which they occured. In this way it is easy to find the problems in the data.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tokenize</span>(<span class="kw">c</span>(<span class="st">&quot;think&quot;</span>, <span class="st">&quot;thin&quot;</span>, <span class="st">&quot;both&quot;</span>), <span class="dt">profile =</span> <span class="st">&quot;test_profile.txt&quot;</span>)</code></pre>
+<pre><code>## Warning in tokenize(c(&quot;think&quot;, &quot;thin&quot;, &quot;both&quot;), profile = test_profile.txt): 
+## There were unknown characters found in the input data.
+## Check output$errors for a table with all problematic strings.</code></pre>
+<pre><code>## $strings
+##   originals tokenized
+## 1     think  th i n ⁇
+## 2      thin    th i n
+## 3      both    ⁇ o th
+## 
+## $profile
+##    matched_rules matched_rules Grapheme
+## 18             0                     ng
+## 17             3                     th
+## 16             0             1         
+## 15             0             2        a
+## 14             0             1        c
+## 13             0             1        e
+## 12             0             2        g
+## 11             0             3        h
+## 10             2             5        i
+## 9              0             1        m
+## 8              2             3        n
+## 7              1             1        o
+## 6              0             2        r
+## 5              0             4        s
+## 4              0             5        t
+## 3              0             1        v
+## 2              0             1        w
+## 1              0             1        y
+## 
+## $errors
+##   originals   errors
+## 1     think th i n ⁇
+## 3      both   ⁇ o th
+## 
+## $missing
+##   Grapheme Frequency Codepoint          UnicodeName
+## 1        b         1    U+0062 LATIN SMALL LETTER B
+## 2        k         1    U+006B LATIN SMALL LETTER K</code></pre>
+</div>
+<div id="transliteration-contexts-classes-and-regular-expressions" class="section level1">
+<h1>Transliteration, Contexts, Classes and Regular Expressions</h1>
+<p>After tokenization (possibly including the usage of rules), the resulting tokenized string can then be transliterated into a different orthographic representation by using the option <code>transliterate</code>. Then the grapheme as specified are used (by default this columns is called “Replacement”, but other names can be used, and one orthography profile can include multiple transliteration columns).</p>
+<p>To achieve contextually determined replacements (e.g. in Italian <c> becomes /k/ except before <i,e>, then it becomes /tʃ/) you can use columns called “Left” and “Right” for left and right contexts, respectively. For example, consider the following toy-profile for Italian:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Grapheme</th>
+<th align="left">Right</th>
+<th align="left">IPA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">c</td>
+<td align="left"></td>
+<td align="left">k</td>
+</tr>
+<tr class="even">
+<td align="left">c</td>
+<td align="left">[ie]</td>
+<td align="left">tʃ</td>
+</tr>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left"></td>
+<td align="left">n</td>
+</tr>
+<tr class="even">
+<td align="left">s</td>
+<td align="left"></td>
+<td align="left">s</td>
+</tr>
+<tr class="odd">
+<td align="left">a</td>
+<td align="left"></td>
+<td align="left">a</td>
+</tr>
+<tr class="even">
+<td align="left">i</td>
+<td align="left"></td>
+<td align="left">i</td>
+</tr>
+</tbody>
+</table>
+<p>To use this profile, you have to add the option <code>regex = TRUE</code> because contextual matching uses regular expressions. Note that you can now also use regular expressions in the specification of the context!</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tokenize</span>(<span class="kw">c</span>(<span class="st">&quot;casa&quot;</span>, <span class="st">&quot;cina&quot;</span>), <span class="dt">profile =</span> italian, <span class="dt">transliterate =</span> <span class="st">&quot;IPA&quot;</span>, <span class="dt">regex =</span> <span class="ot">TRUE</span>)$strings</code></pre>
+<pre><code>##   originals tokenized transliterated
+## 1      casa   c a s a        k a s a
+## 2      cina   c i n a       tʃ i n a</code></pre>
+<p>Another possibility is to use a column “Class” to specify a class of graphemes, and then use this class in the specification of context. You are free to use any class-name you like, as long as it doesn’t clash with the rest of the profile.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Grapheme</th>
+<th align="left">Right</th>
+<th align="left">Class</th>
+<th align="left">IPA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">c</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">k</td>
+</tr>
+<tr class="even">
+<td align="left">c</td>
+<td align="left">frontV</td>
+<td align="left"></td>
+<td align="left">tʃ</td>
+</tr>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">n</td>
+</tr>
+<tr class="even">
+<td align="left">s</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">s</td>
+</tr>
+<tr class="odd">
+<td align="left">a</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">a</td>
+</tr>
+<tr class="even">
+<td align="left">i</td>
+<td align="left"></td>
+<td align="left">frontV</td>
+<td align="left">i</td>
+</tr>
+<tr class="odd">
+<td align="left">e</td>
+<td align="left"></td>
+<td align="left">frontV</td>
+<td align="left">e</td>
+</tr>
+</tbody>
+</table>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tokenize</span>(<span class="kw">c</span>(<span class="st">&quot;casa&quot;</span>, <span class="st">&quot;cina&quot;</span>), <span class="dt">profile =</span> italian, <span class="dt">transliterate =</span> <span class="st">&quot;IPA&quot;</span>, <span class="dt">regex =</span> <span class="ot">TRUE</span>)$strings</code></pre>
+<pre><code>##   originals tokenized transliterated
+## 1      casa   c a s a        k a s a
+## 2      cina   c i n a       tʃ i n a</code></pre>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
