@@ -5,11 +5,13 @@ library(qlcData)
 #  # install devtools from CRAN
 #  install.packages("devtools")
 #  # install qlcData from github using devtools
-#  devtools::install_github("cysouw/qlcData")
+#  devtools::install_github("cysouw/qlcData", build_vignettes = TRUE)
 #  # load qlcTokenize package
 #  library(qlcData)
 #  # access help files of the package
 #  help(qlcData)
+#  # access this vignette
+#  vignette("orthography_processing")
 
 ## ------------------------------------------------------------------------
 test <- "hállo hállо"

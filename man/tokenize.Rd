@@ -33,7 +33,7 @@ tokenize(strings,
   Method for ordering. Currently three different methods are implemented, which can be combined (see Details below): \code{size}, \code{context}, \code{reverse} and \code{frequency}. Use \code{NULL} to prevent ordering and use the top to bottom order as specified in the orthography profile.
 }
   \item{sep}{
-  Separator to be inserted between graphemes. Defaults to space. This function assumes that the separator specified here does not occur in the data. If it does, unexpected things might happen. Consider removing the chosen seperator from your strings first, e.g. by using \code{\link[base]{gsub}}.
+  Separator to be inserted between graphemes. Defaults to space. This function assumes that the separator specified here does not occur in the data. If it does, unexpected things might happen. Consider removing the chosen seperator from your strings first, e.g. by using \code{\link[base]{gsub}} or use the option \code{sep.replace}.
 }
   \item{sep.replace}{
   Sometimes, the chosen separator (see above) occurs in the strings to be parsed. This is technically not a problem, but the result might show unexpected sequences. When \code{sep.replace} is specified, this marking is inserted in the string at those places where the \code{sep} marker occurs. Typical usage in linguistics would be \code{sep = " ", sep.replace = "#"} adding spaces between graphemes and replacing spaces in the input string by hashes in the output string.
@@ -45,7 +45,7 @@ tokenize(strings,
   Which normalization to use before tokenization, defaults to "NFC". Other option is "NFD". Any other input will result in no normalisation being performed.
 }
   \item{regex}{
-  Logical: when \code{regex = FALSE} internally the matching of graphemes is done exact, i.e. without using regular expressions. When \code{regex = TRUE} ICU-style regular expression (see \code{\link[stringi]{stringi-search-regex}}) are used, so any reserved characters have to be escaped in the orthography profile. Specifically, add a slash "\" before any occurrence of the characters \code{ [](){}|+*.-!?ˆ$\ } in your profile (except of course when these characters are used in their regular expression meaning).
+  Logical: when \code{regex = FALSE} internally the matching of graphemes is done exact, i.e. without using regular expressions. When \code{regex = TRUE} ICU-style regular expression (see \code{\link[stringi]{stringi-search-regex}}) are used for all content in the profile (including the Grapheme-column!), so any reserved characters have to be escaped in the orthography profile. Specifically, add a slash "\" before any occurrence of the characters \code{ [](){}|+*.-!?ˆ$\ } in your profile (except of course when these characters are used in their regular expression meaning).
   
 Note that this parameter also influences whether contexts should be considered in the tokenization (internally, contextual searching uses regular expressions). By default, when \code{regex = FALSE}, context is ignored. If \code{regex = TRUE} then the function checks whether there are columns called \code{Left} (for the left context) and \code{Right} (for the right context), and optionally a column called \code{Class} (for the specification of grapheme-classes) in the orthography profile. These are hard-coded column-names, so please adapt your orthography profile accordingly. The columns \code{Left} and \code{Right} allow for regular expression to specify context.
 }
@@ -60,28 +60,28 @@ Note that this parameter also influences whether contexts should be considered i
 }
 }
 \details{
-Given a set of graphemes, there are at least two different methods to tokenize strings. The first is called \code{global} here: this approach takes the first grapheme, matches this grapheme globally at all places in the string, and then turns to the next string. The other approach is called \code{linear} here: this approach walks through the string from left to right. At the first character it looks through all graphemes whether there is any match, and then walks further to the end of the match and starts again. In some special cases these two methods can lead to different results (see Examples for an example).
+Given a set of graphemes, there are at least two different methods to tokenize strings. The first is called \code{global} here: this approach takes the first grapheme, matches this grapheme globally at all places in the string, and then turns to the next string. The other approach is called \code{linear} here: this approach walks through the string from left to right. At the first character it looks through all graphemes whether there is any match, and then walks further to the end of the match and starts again. In some special cases these two methods can lead to different results (see Examples).
 
-The ordering or the lines in the ortography profile is of crucial importance, and different orderings will lead to radically different results. To simply use the top to bottom ordering as specified in the profile, use \code{order = NULL}. Currently, there are four different ordering strategies implemented: \code{size}, \code{context}, \code{reverse} and \code{frequency}. By specifying more than one in a vector, these orderings are used to break ties, e.g. \code{c("size, frequency", "reverse")} will first order by size, and for those with the same size, it will order by frequency. For lines that are still tied (i.e. the have the same size and frequency) the order will reverse order as attested in the profile. Reversing order can be useful, because hand-written profiles tend to put general rules before specific rules, which mostly should be applied in reverse order.
+The ordering or the lines in the ortography profile is of crucial importance, and different orderings will lead to radically different results. To simply use the top to bottom ordering as specified in the profile, use \code{order = NULL}. Currently, there are four different ordering strategies implemented: \code{size}, \code{context}, \code{reverse} and \code{frequency}. By specifying more than one in a vector, these orderings are used to break ties, e.g. the default specification \code{c("size", "context", "reverse")} will first order by size, and for those with the same size, it will order by whether any context is specifed (with context coming first). For lines that are still tied (i.e. the have the same size and all either have or have no context) the order will be reversed in comparison to the order as attested in the profile. Reversing order can be useful, because hand-written profiles tend to put general rules before specific rules, which mostly should be applied in reverse order.
 
 \itemize{
 \item \code{size}: order the lines in the profile by the size of the grapheme, largest first. Size is measured by number of Unicode characters after normalization as specified in the option \code{normalize}. For example, \code{é} has a size of 1 with \code{normalize = "NFC"}, but a size of 2 with \code{normalize = "NFD"}.
 
-\item \code{context:} order the lines by whether they have any context specified, lines with context coming first. Note that this only works when the option \code{context = TRUE} is also chosen.
+\item \code{context:} order the lines by whether they have any context specified, lines with context coming first. Note that this only works when the option \code{regex = TRUE} is also chosen.
 
 \item \code{reverse:} order the lines from bottom to top.
 
-\item \code{frequency}: order the lines by the frequency with which they match in the specified strings before tokenization, least frequent coming first. This frequency of course depends crucially on the available strings, so it will lead to different orderings when applied to different data. Also note that this frequency is (necessarily) measured before graphemes are identified, so these ordering frequencies are not the same as the final frequencies shown in the outpur. Frequency of course also strongly differs on whether context is used for the matching through \code{context = TRUE}.
+\item \code{frequency}: order the lines by the frequency with which they match in the specified strings before tokenization, least frequent coming first. This frequency of course depends crucially on the available strings, so it will lead to different orderings when applied to different data. Also note that this frequency is (necessarily) measured before graphemes are identified, so these ordering frequencies are not the same as the final frequencies shown in the outpur. Frequency of course also strongly differs on whether context is used for the matching through \code{regex = TRUE}.
 }
 }
 \value{
-Without specificatino of \code{file.out}, the function \code{tokenize} will return a list of three:
+Without specificatino of \code{file.out}, the function \code{tokenize} will return a list of four:
 \item{strings}{a dataframe with the original and the tokenized/transliterated strings}
 \item{profile}{a dataframe with the graphemes with added frequencies. The dataframe is ordered according to the order that resulted from the specifications in \code{ordering}.}
 \item{errors}{a dataframe with all original strings that contain unmatched parts.}
 \item{missing}{a dataframe with the graphemes that are missing from the original orthography profilr, as indicated in the errors. Note that the report of missing characters does currently not lead to correct results for transliterated strings.}
 
-When \code{file} is specified, these three tables will be written to three different tab-separated files (with header lines): \code{file_strings.tsv} for the strings, \code{file_profile.tsv} for the orthrography profile, \code{file_errors.tsv} for the strings that have unidentifyable parts, and \code{file_missing.tsv} for the graphemes that seem to be missing. When there is nothing missing, then no file for the missing strings is produced.
+When \code{file.out} is specified, these four tables will be written to three different tab-separated files (with header lines): \code{file_strings.tsv} for the strings, \code{file_profile.tsv} for the orthrography profile, \code{file_errors.tsv} for the strings that have unidentifyable parts, and \code{file_missing.tsv} for the graphemes that seem to be missing. When there is nothing missing, then no file for the missing strings is produced.
 }
 \references{
 Moran & Cysouw (forthcoming)
@@ -99,17 +99,23 @@ When \code{regex = TRUE}, regular expressions are acceptable in the columns `Gra
 \item \[ (U+005B, LEFT SQUARE BRACKET)
 \item \] (U+005D, RIGHT SQUARE BRACKET)
 \item \{ (U+007B, LEFT CURLY BRACKET)
-\item | (007C, VERTICAL LINE)
 \item \} (U+007D, RIGHT CURLY BRACKET)
+\item | (007C, VERTICAL LINE)
 \item * (U+002A, ASTERISK)
 \item \ (U+005C, REVERSE SOLIDUS)
-\item ˆ (U+02C6, MODIFIER LETTER CIRCUMFLEX ACCENT)
+\item ˆ (U+005E, CIRCUMFLEX ACCENT)
 \item + (U+002B, PLUS SIGN)
 \item $ (U+0024, DOLLAR SIGN)
 }
 
 Note that overlapping matching does not (yet) work with regular expressions. That means that for example "aa" is only found once in "aaa". In some special cases this might lead to problems that might have to be explicitly specified in the profile, e.g. a grapheme "aa" with a left context "a". See examples below. This problem arises because overlap is only available in literal searches \code{\link[stringi]{stri_opts_fixed}}, but the current function uses regex-searching, which does not catch overlap \code{\link[stringi]{stri_opts_regex}}.
 }
+\note{
+There is a bash-executable distributed with this package (based on the \code{docopt} package) that let you use this function directly in a bash-terminal. The easiest way to use this executable is to softlink the executable to some directory in your bash PATH, for example \code{/usr/local/bin}. To softlink the function \code{tokenize} to this directory, use something like the following in your bash terminal:
+
+\code{ln -is `Rscript -e 'cat(file.path(find.package("qlcData"), "exec", "tokenize"))'` /usr/local/bin}
+}
+
 \author{
 Michael Cysouw <cysouw@mac.com>
 }
