@@ -12,7 +12,7 @@
 
 <meta name="author" content="Michael Cysouw" />
 
-<meta name="date" content="2018-01-02" />
+<meta name="date" content="2018-01-05" />
 
 <title>Specifying orthography: harmonization, tokenization and transliteration</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Specifying orthography: harmonization, tokenization and transliteration</h1>
 <h4 class="author"><em>Michael Cysouw</em></h4>
-<h4 class="date"><em>2018-01-02</em></h4>
+<h4 class="date"><em>2018-01-05</em></h4>
 
 
 
@@ -293,7 +293,7 @@ devtools<span class="op">::</span><span class="kw">install_github</span>(<span c
 <h1>Tokenization</h1>
 <p>In most cases you will probably want to use the function <code>tokenize</code>. Besides creating orthography profiles, it will also check orthography profiles against new data (and give warnings if there is something), it will separate the input strings into graphemes, and even perform transliteration. Let’s run through a typical workflow using <code>tokenize</code>.</p>
 <p>Given some data in a specific orthography, you can call <code>tokenize</code> on the data to create an initial orthography profile (just like with <code>write.profile</code> discussed above, though there are less options for the splitting of graphemes, the addition of info, etc.).</p>
-<p>The output of <code>tokenize</code> always is a list of four elements: <code>$strings</code>, <code>$profile</code>, <code>$errors</code>, and <code>$missing</code>. The second element in the list <code>$profile</code> is the table we already encountered above. The first element <code>$strings</code> is a table with the original strings, and the tokenization into graphemes as specified by the orthography profile (which in the case below was automatically produced, so there is nothing strange happening here, just a splitting into letters). The <code>$errors</code> and <code>$missing</code> are just empty at this stage, but it will contain information about strings that cannot be tokenized with a pre-established profile.</p>
+<p>The output of <code>tokenize</code> always is a list of four elements: <code>$strings</code>, <code>$profile</code>, <code>$errors</code>, and <code>$missing</code>. The second element in the list <code>$profile</code> is the table we already encountered above (though in a different order because of different default settings). The first element <code>$strings</code> is a table with the original strings, and the tokenization into graphemes as specified by the orthography profile (which in the case below was automatically produced, so there is nothing strange happening here, just a splitting into letters). The <code>$errors</code> and <code>$missing</code> are just empty at this stage, but it will contain information about strings that cannot be tokenized with a pre-established profile.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tokenize</span>(test)</code></pre></div>
 <pre><code>## $strings
 ##    originals         tokenized
@@ -306,23 +306,23 @@ devtools<span class="op">::</span><span class="kw">install_github</span>(<span c
 ## 7    strings     s t r i n g s
 ## 
 ## $profile
-##    matched_rules Grapheme
-## 1              1        y
-## 2              1        w
-## 3              1        v
-## 4              5        t
-## 5              4        s
-## 6              2        r
-## 7              1        o
-## 8              3        n
-## 9              1        m
-## 10             5        i
-## 11             3        h
-## 12             2        g
-## 13             1        e
-## 14             1        c
-## 15             2        a
-## 16             1         
+##    Grapheme Frequency
+## 1         y         1
+## 2         w         1
+## 3         v         1
+## 4         t         5
+## 5         s         4
+## 6         r         2
+## 7         o         1
+## 8         n         3
+## 9         m         1
+## 10        i         5
+## 11        h         3
+## 12        g         2
+## 13        e         1
+## 14        c         1
+## 15        a         2
+## 16                  1
 ## 
 ## $errors
 ## NULL
@@ -333,86 +333,86 @@ devtools<span class="op">::</span><span class="kw">install_github</span>(<span c
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dir.create</span>(<span class="st">&quot;~/Desktop/tokenize&quot;</span>)
 <span class="kw">setwd</span>(<span class="st">&quot;~/Desktop/tokenize&quot;</span>)
 <span class="kw">tokenize</span>(test, <span class="dt">file.out =</span> <span class="st">&quot;test_profile.txt&quot;</span>)</code></pre></div>
-<p>We are going to add two new “tailored grapheme clusters” to this profile: open the file “test_profile.txt” (in the folder “tokenize” on your Desktop) with a text editor like Textmate, Textwrangler or Notepad++ (don’t use Microsoft Word!!!). First, add a new line with only “th” on it and, second, add another line with only “ng” on it. The file will then roughly look like this:</p>
+<p>We are going to add two new “tailored grapheme clusters” to this profile: open the file “test_profile.txt” (in the folder “tokenize” on your Desktop) with a text editor like SublimeText, Atom, Textmate, Textwrangler/BBedit or Notepad++ (don’t use Microsoft Word!!!). First, add a new line with only “th” on it and, second, add another line with only “ng” on it. The file will then roughly look like this:</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">matched_rules</th>
 <th align="left">Grapheme</th>
+<th align="left">Frequency</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1</td>
 <td align="left">y</td>
+<td align="left">1</td>
 </tr>
 <tr class="even">
-<td align="left">1</td>
 <td align="left">w</td>
+<td align="left">1</td>
 </tr>
 <tr class="odd">
-<td align="left">1</td>
 <td align="left">v</td>
+<td align="left">1</td>
 </tr>
 <tr class="even">
-<td align="left">5</td>
 <td align="left">t</td>
-</tr>
-<tr class="odd">
-<td align="left">4</td>
-<td align="left">s</td>
-</tr>
-<tr class="even">
-<td align="left">2</td>
-<td align="left">r</td>
-</tr>
-<tr class="odd">
-<td align="left">1</td>
-<td align="left">o</td>
-</tr>
-<tr class="even">
-<td align="left">3</td>
-<td align="left">n</td>
-</tr>
-<tr class="odd">
-<td align="left">1</td>
-<td align="left">m</td>
-</tr>
-<tr class="even">
 <td align="left">5</td>
-<td align="left">i</td>
 </tr>
 <tr class="odd">
+<td align="left">s</td>
+<td align="left">4</td>
+</tr>
+<tr class="even">
+<td align="left">r</td>
+<td align="left">2</td>
+</tr>
+<tr class="odd">
+<td align="left">o</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="left">n</td>
 <td align="left">3</td>
+</tr>
+<tr class="odd">
+<td align="left">m</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="left">i</td>
+<td align="left">5</td>
+</tr>
+<tr class="odd">
 <td align="left">h</td>
+<td align="left">3</td>
 </tr>
 <tr class="even">
-<td align="left">2</td>
 <td align="left">g</td>
-</tr>
-<tr class="odd">
-<td align="left">1</td>
-<td align="left">e</td>
-</tr>
-<tr class="even">
-<td align="left">1</td>
-<td align="left">c</td>
-</tr>
-<tr class="odd">
 <td align="left">2</td>
-<td align="left">a</td>
-</tr>
-<tr class="even">
-<td align="left">1</td>
-<td align="left"></td>
 </tr>
 <tr class="odd">
-<td align="left"></td>
-<td align="left">th</td>
+<td align="left">e</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="left">c</td>
+<td align="left">1</td>
+</tr>
+<tr class="odd">
+<td align="left">a</td>
+<td align="left">2</td>
 </tr>
 <tr class="even">
 <td align="left"></td>
+<td align="left">1</td>
+</tr>
+<tr class="odd">
+<td align="left">th</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
 <td align="left">ng</td>
+<td align="left"></td>
 </tr>
 </tbody>
 </table>
@@ -435,25 +435,25 @@ devtools<span class="op">::</span><span class="kw">install_github</span>(<span c
 ## 7    strings   s t r i ng s
 ## 
 ## $profile
-##    matched_rules matched_rules Grapheme
-## 18             2                     ng
-## 17             3                     th
-## 16             1             1         
-## 15             2             2        a
-## 14             1             1        c
-## 13             1             1        e
-## 12             0             2        g
-## 11             0             3        h
-## 10             5             5        i
-## 9              1             1        m
-## 8              1             3        n
-## 7              1             1        o
-## 6              2             2        r
-## 5              4             4        s
-## 4              2             5        t
-## 3              1             1        v
-## 2              1             1        w
-## 1              1             1        y
+##    Grapheme Frequency
+## 18       ng         2
+## 17       th         3
+## 16                  1
+## 15        a         2
+## 14        c         1
+## 13        e         1
+## 12        g         0
+## 11        h         0
+## 10        i         5
+## 9         m         1
+## 8         n         1
+## 7         o         1
+## 6         r         2
+## 5         s         4
+## 4         t         2
+## 3         v         1
+## 2         w         1
+## 1         y         1
 ## 
 ## $errors
 ## NULL
@@ -472,25 +472,25 @@ devtools<span class="op">::</span><span class="kw">install_github</span>(<span c
 ## 3      both    ⁇ o th
 ## 
 ## $profile
-##    matched_rules matched_rules Grapheme
-## 18             0                     ng
-## 17             3                     th
-## 16             0             1         
-## 15             0             2        a
-## 14             0             1        c
-## 13             0             1        e
-## 12             0             2        g
-## 11             0             3        h
-## 10             2             5        i
-## 9              0             1        m
-## 8              2             3        n
-## 7              1             1        o
-## 6              0             2        r
-## 5              0             4        s
-## 4              0             5        t
-## 3              0             1        v
-## 2              0             1        w
-## 1              0             1        y
+##    Grapheme Frequency
+## 18       ng         0
+## 17       th         3
+## 16                  0
+## 15        a         0
+## 14        c         0
+## 13        e         0
+## 12        g         0
+## 11        h         0
+## 10        i         2
+## 9         m         0
+## 8         n         2
+## 7         o         1
+## 6         r         0
+## 5         s         0
+## 4         t         0
+## 3         v         0
+## 2         w         0
+## 1         y         0
 ## 
 ## $errors
 ##   originals   errors

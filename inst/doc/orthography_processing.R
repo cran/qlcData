@@ -47,7 +47,7 @@ tokenize(test)
 #  tokenize(test, file.out = "test_profile.txt")
 
 ## ---- echo = FALSE, results='asis'---------------------------------------
-test_profile.txt <- as.data.frame(rbind(as.matrix(tokenize(test)$profile),c(" ", "th"),c(" ","ng")))
+test_profile.txt <- as.data.frame(rbind(as.matrix(tokenize(test)$profile),c("th", ""),c("ng", "")))
 knitr::kable(test_profile.txt)
 
 ## ---- eval = FALSE-------------------------------------------------------
