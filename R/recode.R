@@ -2,11 +2,21 @@
 # recode data according to specifications in recoding
 #=======================
 
-recode <- function(data, recoding) {
+recode <- function(recoding, data = NULL) {
 
   # expand the possible shortcuts in the formulation of a recoding
   recodings <- read.recoding(recoding)
 
+  # try to read csv data from relative path in profile
+  # when no explicit data is given here
+  if (is.null(data)) {
+    if (is.null(recodings$originalData)) {
+      stop("Specify data, either in recoding or in function-call")
+    } else {
+      data <- read.csv(recodings$originalData)
+    }
+  }
+  
   # prepare data when single column
   singleColumn <- FALSE
   if (is.null(dim(data))) {
@@ -18,7 +28,10 @@ recode <- function(data, recoding) {
   if (singleColumn) {
     result <- .makeAttribute(recodings, data, singleColumn = TRUE)
   } else {
-    result <- as.data.frame(sapply(recodings, .makeAttribute, data = data, simplify = F))
+    result <- sapply(recodings, .makeAttribute, data = data, simplify = FALSE)
+    names <- unlist(sapply(result, colnames))
+    result <- as.data.frame(result)
+    colnames(result) <- names
   }
   return(result)
 }
@@ -34,6 +47,9 @@ recode <- function(data, recoding) {
     newAttribute <- data[,recoding$doNotRecode, drop = FALSE]
   } else {
     
+    recoding$link <- unlist(recoding$link)
+    recoding$values <- unlist(recoding$values)
+    
     recoding$link[recoding$link == 0]  <- NA
     
     # simple when it is based on a single old attribute
@@ -43,17 +59,18 @@ recode <- function(data, recoding) {
         newAttribute <- as.factor(data)
         levels(newAttribute) <- recoding$values[recoding$link]
       } else {
-        newAttribute <- data[,recoding$recodingOf, drop = FALSE]
+        newAttribute <- as.factor(data[,recoding$recodingOf])
         
         linkNames <- names(recoding$link)
         if (!is.null(linkNames)) {
           # connect linkNames to levels newAttribite
-          linkage <- match(levels(newAttribute[,1]),linkNames)
-          levels(newAttribute[,1]) <- recoding$values[linkage][recoding$link]
+          linkage <- match(levels(newAttribute),linkNames)
+          levels(newAttribute) <- recoding$link[linkage]
         } else {
           # assume order of link matches order of levels newAttribute
-          levels(newAttribute[,1]) <- recoding$values[recoding$link]
+          levels(newAttribute) <- recoding$values[recoding$link]
         }
+        newAttribute <- as.data.frame(newAttribute)
         colnames(newAttribute) <- recoding$attribute
       }
       
@@ -61,13 +78,13 @@ recode <- function(data, recoding) {
       
       # a bit more complex for combinations of attributes
       newAttribute <- data[,recoding$recodingOf, drop = FALSE]
-      newAttribute <- apply(newAttribute,1,function(x){paste(x, collapse = " + ")})
+      newAttribute <- apply(newAttribute, 1, function(x){paste(x, collapse = " + ")})
       
       if(!is.null(names(recoding$link))){
         # when link has names are in profile, use these
         match <- names(recoding$link)
       } else if (!is.null(names(recoding$originalFrequency))) {
-        # when originalFrequency has nems, use these
+        # when originalFrequency has names, use these
         match <- names(recoding$originalFrequency)
       } else {
         # recreate all possible interactions and use those
@@ -76,7 +93,7 @@ recode <- function(data, recoding) {
             c(levels(data[,x]),NA) 
           }, simplify = FALSE )
         )
-        match <- apply(match,1,function(x){paste(x, collapse = " + ")})
+        match <- apply(match, 1, function(x){paste(x, collapse = " + ")})
       }
       
       newAttribute <- factor(newAttribute, levels = match)

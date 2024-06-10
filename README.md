@@ -1,11 +1,11 @@
-[![version](http://www.r-pkg.org/badges/version/qlcData)](https://CRAN.R-project.org/package=qlcData)
-![downloads](http://cranlogs.r-pkg.org/badges/qlcData)
+[![version](https://www.r-pkg.org/badges/version/qlcData)](https://CRAN.R-project.org/package=qlcData)
+![downloads](https://cranlogs.r-pkg.org/badges/qlcData)
 [![DOI](https://zenodo.org/badge/19068/cysouw/qlcData.svg)](https://zenodo.org/badge/latestdoi/19068/cysouw/qlcData)
 
 qlcData
 ==========
 
-**Functions for data managements in Quantitative Language Comparison (QLC)**
+**Functions for data managements in Quantitative Language Comparison**
 
 The package combines various methods to deal with data in language comparison, and it is intended to grow in the future to allow different datasets to be used and compared.
 

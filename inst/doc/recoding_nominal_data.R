@@ -1,7 +1,7 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 library(qlcData)
 
-## ----nominalData---------------------------------------------------------
+## ----nominalData--------------------------------------------------------------
 data <- data.frame(
     size = c('large','very small','small','large','very small','tiny'),
     kind = c('young male','young female','old female','old male',NA,'young female'),
@@ -9,7 +9,7 @@ data <- data.frame(
     )
 data
 
-## ----merge---------------------------------------------------------------
+## ----merge--------------------------------------------------------------------
 # Specifying a recoding
 recoding <- list(
   list(
@@ -20,9 +20,9 @@ recoding <- list(
     )
   )
 # Do the actual recoding and see the results
-recode(data, recoding)
+recode(recoding, data)
 
-## ----mergesplit----------------------------------------------------------
+## ----mergesplit---------------------------------------------------------------
 # Specifying the recoding of three different new attributes
 recoding <- list(
   list(
@@ -45,27 +45,46 @@ recoding <- list(
     )
   )
 # Do the recoding and show it
-newdata <- recode(data, recoding)
+newdata <- recode(recoding, data)
 newdata
 
-## ----mergeattributes-----------------------------------------------------
+## ----mergeattributes----------------------------------------------------------
 back_recoding <- list(
   list(
     recodingOf = c('size','age'),
     attribute = 'size+age',
-    values = c('large+old','large+young','small+old','small+young'),
+    values = c('largeOld','largeYoung','smallOld','smallYoung'),
     link = c(1,3,0,2,4,0,0,0,0,0)
     )
   )
-recode(newdata, back_recoding)
+recode(back_recoding, newdata)
 
-## ----expandgrid----------------------------------------------------------
+## ----expandgrid---------------------------------------------------------------
 expand.grid(c(levels(newdata$size),NA),c(levels(newdata$age),NA))
 
-## ----yamloutput, echo = FALSE--------------------------------------------
-cat(yaml::as.yaml(write.recoding(list(1,c(1,2)),data,yaml=F)))
+## ----yamloutput, echo = FALSE-------------------------------------------------
+cat(yaml::as.yaml(write.recoding(data, attributes=list(1,c(1,2)))))
 
-## ----shortcuts-----------------------------------------------------------
+## ----mergeattributes_v2-------------------------------------------------------
+back_recoding <- list(
+  list(
+    recodingOf = c('size','age'),
+    attribute = 'size+age',
+    values = c( lo = 'largeOld'
+              , ly = 'largeYoung'
+              , so = 'smallOld'
+              , sy = 'smallYoung'
+      ),
+    link = c(  'small + young' = 'sy'
+             , 'small + old' = 'so'
+             , 'large + young' = "ly"
+             , 'large + old' = 'lo'
+      )
+    )
+  )
+recode(back_recoding, newdata)
+
+## ----shortcuts----------------------------------------------------------------
 short_recoding <- list(
   # same as first example at the start of this vignette
   # using abbreviations and a different order
@@ -74,6 +93,13 @@ short_recoding <- list(
     a = 'newSize',
     l = c(1,2,2,2),
     v = c('large','small')
+    ),
+  # the same, using named linking
+  list(
+    r = 'size',
+    a = 'newSize',
+    v = list(a = 'large', b = 'small'),
+    l = list(tiny = 'b', 'very small' = 'b', small = 'b', large = 'a')
     ),
   # same new attribute, but with automatically generated names
   list(
@@ -87,21 +113,22 @@ short_recoding <- list(
   # add three times the first original attribute
   # senseless, but it illustrates the possibilities
   list(
-    d = c(1,1,1)
+    d = c(1,2)
     )
   )
-recode(data, short_recoding)
+recode(short_recoding, data)
 
-## ----expand_shortcuts_notrun, eval = FALSE-------------------------------
-#  read.recoding(short_recoding, file = yourFile , data =  data)
+## ----expand_shortcuts_notrun, eval = FALSE------------------------------------
+#  read.recoding(short_recoding, file = yourFile, data = data)
 
-## ----expand_shortcuts, echo = FALSE--------------------------------------
+## ----expand_shortcuts, echo = FALSE-------------------------------------------
 meta <- list(
   title = NULL,
   author = NULL,
-  date = format(Sys.time(),"%Y-%m-%d")
+  date = format(Sys.time(),"%Y-%m-%d"),
+  originalData = "data"
   )
-recoding <- read.recoding(short_recoding, file = NULL , data =  data)
+recoding <- read.recoding(short_recoding, file = NULL , data = data)
 outfile <- c(meta, list(recoding = recoding))
 cat(yaml::as.yaml(outfile))
 
